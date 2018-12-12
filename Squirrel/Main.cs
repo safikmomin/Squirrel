@@ -21,7 +21,10 @@ namespace Squirrel
                     db.CreateTable<Item>();
                     db.CreateTable<Order>();
                     db.CreateTable<OrderItem>();
+                    db.CreateTable<Category>();
                     db.CreateTable<Customer>();
+                    db.CreateTable<ItemBarcode>();
+                    db.CreateTable<ItemCategory>();
                 }
             }
             // if you want to use a different Application Delegate class from "AppDelegate"

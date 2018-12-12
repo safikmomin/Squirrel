@@ -9,9 +9,12 @@ namespace Squirrel.Controller.Register
     public class ItemCollectionView : UICollectionViewSource
     {
         List<string> list = new List<string>();
+        ViewController MainController;
 
-        public ItemCollectionView(int num)
+
+        public ItemCollectionView(int num, ViewController MainController)
         {
+            this.MainController = MainController;
             for (int i = 0; i < num; i++)
             {
                 list.Add(i.ToString());
@@ -39,15 +42,20 @@ namespace Squirrel.Controller.Register
 
         public override UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
         {
+            UITapGestureRecognizer gestureTap = new UITapGestureRecognizer((obj) => {
+                var name = obj.View as ItemCell;
+            });
             var item = (ItemCell)collectionView.DequeueReusableCell(ItemCell.CellId, indexPath);
+            item.AddGestureRecognizer(gestureTap);
             item.TopLabel = list[indexPath.Row] + " Chicken Tikka with chicken gravey";
             item.BottomLabel = "$1.99";
+            item.idLabel = list[indexPath.Row];
             return item;
         }
 
-        private void ButtonCliclk(object sender, EventArgs e)
+        private void ButtonCliclk(UITapGestureRecognizer obj)
         {
-            var x = sender as UIButton;
+            var x = obj.View as ItemCell;
             //MainController.AddItemInRow((int)x.Tag);
             //Console.WriteLine("I clicked: " + x.CurrentTitle);
         }
@@ -61,11 +69,24 @@ namespace Squirrel.Controller.Register
         public override void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
         {
             Console.WriteLine("Row {0} selected", indexPath.Row);
+            list = new List<string>();
+            MainController.UpdateView();
         }
 
-        public override bool ShouldSelectItem(UICollectionView collectionView, NSIndexPath indexPath)
+        public override void ItemHighlighted(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            //var cell = collectionView.CellForItem(indexPath) as ItemCell;
+            //cell.ContentView.BackgroundColor = UIColor.Yellow;
+        }
+
+        public override bool ShouldHighlightItem(UICollectionView collectionView, NSIndexPath indexPath)
         {
             return true;
+        }
+
+        void HandleAction(object sender, EventArgs e)
+        {
+
         }
 
     }
@@ -74,6 +95,7 @@ namespace Squirrel.Controller.Register
     {
         UILabel MainLabel;
         UILabel SecondLabel;
+        UILabel IDLabel;
         UIStackView stackView;
         public static readonly NSString CellId = new NSString("TextCell");
 
@@ -88,7 +110,6 @@ namespace Squirrel.Controller.Register
                 //Spacing = 10,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-
             MainLabel = new UILabel
             {
                 TextColor = UIColor.DarkGray,
@@ -109,11 +130,21 @@ namespace Squirrel.Controller.Register
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
+            IDLabel = new UILabel
+            {
+                BackgroundColor = UIColor.FromRGB(66, 165, 245),
+                TextColor = UIColor.White,
+                TextAlignment = UITextAlignment.Center,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Hidden = true
+            };
+
             MainLabel.Layer.CornerRadius = 10.0f;
             SecondLabel.Layer.CornerRadius = 10.0f;
 
             stackView.AddArrangedSubview(SecondLabel);
             stackView.AddArrangedSubview(MainLabel);
+            stackView.AddArrangedSubview(IDLabel);
             ContentView.AddSubview(stackView);
             SecondLabel.HeightAnchor.ConstraintEqualTo(20).Active = true;
             SecondLabel.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor).Active = true;
@@ -132,27 +163,24 @@ namespace Squirrel.Controller.Register
 
         public string TopLabel
         {
-            get
-            {
-                return MainLabel.Text;
-            }
-            set
-            {
-                MainLabel.Text = value;
-            }
+            get { return MainLabel.Text; }
+            set { MainLabel.Text = value; }
         }
 
         public string BottomLabel
         {
-            get
-            {
-                return SecondLabel.Text;
-            }
-            set
-            {
-                SecondLabel.Text = value;
-            }
+            get { return SecondLabel.Text; }
+            set { SecondLabel.Text = value; }
         }
+
+        public string idLabel
+        {
+            get { return IDLabel.Text; }
+            set { IDLabel.Text = value; }
+        }
+
+
+
     }
 
 }

@@ -131,6 +131,8 @@
     <Folder Include="Resources\Componant\" />
     <Folder Include="Assets.xcassets\Cancel.imageset\" />
     <Folder Include="Controller\Settings\" />
+    <Folder Include="Model\DBModel\" />
+    <Folder Include="Model\PModel\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -163,14 +165,15 @@
     <Compile Include="Controller\Settings\MenuViewController.designer.cs">
       <DependentUpon>MenuViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\Category.cs" />
-    <Compile Include="Model\Customer.cs" />
     <Compile Include="Model\DataAcess.cs" />
-    <Compile Include="Model\Item.cs" />
-    <Compile Include="Model\ItemBarcode.cs" />
-    <Compile Include="Model\ItemCategory.cs" />
-    <Compile Include="Model\Order.cs" />
-    <Compile Include="Model\OrderItem.cs" />
+    <Compile Include="Controller\Register\SideTableViewSource.cs" />
+    <Compile Include="Model\DBModel\Category.cs" />
+    <Compile Include="Model\DBModel\Customer.cs" />
+    <Compile Include="Model\DBModel\Item.cs" />
+    <Compile Include="Model\DBModel\ItemBarcode.cs" />
+    <Compile Include="Model\DBModel\ItemCategory.cs" />
+    <Compile Include="Model\DBModel\Order.cs" />
+    <Compile Include="Model\DBModel\OrderItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Utility.cs" />

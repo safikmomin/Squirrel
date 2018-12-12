@@ -121,11 +121,11 @@ namespace Squirrel
             UIViewController controller = MainBoard.InstantiateViewController("CheckOutViewController") as CheckOutViewController;
             if(button.TitleLabel.Text == "Register")
             {
-                controller = MainBoard.InstantiateViewController("CheckOutViewController") as CheckOutViewController;
+                controller = MainBoard.InstantiateViewController("ViewController") as ViewController;
             }
             else
             {
-                controller = MainBoard.InstantiateViewController("ViewController") as ViewController;
+                controller = MainBoard.InstantiateViewController("CheckOutViewController") as CheckOutViewController;
             }
             this.NavigationController.PopToRootViewController(true);
             //this.NavigationController.PushViewController(controller, true);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using CoreGraphics;
 using Foundation;
+using POSUP.Model;
 using Squirrel;
 using Squirrel.Controller.Register;
 using UIKit;
@@ -13,9 +14,7 @@ namespace Squirrel
     {
         private UIStackView TopRightStackView;
         private UIStackView LeftStackView;
-        //private UIStackView SearchStackView;
         private UIStackView RightStackView;
-        //private UIStackView FullStackView;
         private UILabel TopRightLabel;
         private UIButton TopRightButton;
         private UITableView RightTableView;
@@ -28,6 +27,8 @@ namespace Squirrel
         private UIStoryboard MainBoard;
         private UIStoryboard SettingsBoard;
         private MainNavigationViewController mainNavigation;
+        private static NSString TabelCellId = new NSString("OrderItemCell");
+        private List<Item> OrderedItem;
 
         protected ViewController(IntPtr handle) : base(handle)
         {
@@ -85,10 +86,12 @@ namespace Squirrel
             RightStackView.AddArrangedSubview(TopRightStackView);
             //View.AddConstraint(TopLeftStackView.TopAnchor.ConstraintEqualTo(this.View.TopAnchor, 100f));
             //TopLeftStackView.TopAnchor.ConstraintEqualTo(margins.TopAnchor).Active = true;
+            OrderedItem = new List<Item>();
             RightTableView = new UITableView
             {
                 Source = new SideTableViewSource(null, this)
             };
+            RightTableView.RegisterClassForCellReuse(typeof(SideTableViewCell), TabelCellId);
             RightStackView.AddArrangedSubview(RightTableView);
             RightTableView.Layer.BorderColor = UIColor.LightGray.CGColor;
             RightTableView.Layer.BorderWidth = 1;
@@ -145,12 +148,13 @@ namespace Squirrel
                 ItemSize = new SizeF(150, 80),
                 ScrollDirection = UICollectionViewScrollDirection.Vertical
             };
-            ItemCollectionView CVSource = new ItemCollectionView(100);
+            ItemCollectionView CVSource = new ItemCollectionView(100,this);
             CollectionView = new UICollectionView(UIScreen.MainScreen.Bounds, CollectionViewlayout);
-            CollectionView.ContentSize = View.Frame.Size;
+            //CollectionView.ContentSize = View.Frame.Size;
             CollectionView.RegisterClassForCell(typeof(ItemCell), ItemCell.CellId);
             CollectionView.BackgroundColor = UIColor.Clear;
             CollectionView.Source = CVSource;
+
 
             LeftStackView.AddArrangedSubview(CollectionView);
 
@@ -194,12 +198,13 @@ namespace Squirrel
             ClearButton = new UIButton();
 
             //BackButton.SetTitle("<", UIControlState.Normal);
-            ClearButton.SetTitle("Clear Order", UIControlState.Normal);
+            ClearButton.SetTitle("Clear", UIControlState.Normal);
             BackButton.SetImage(UIImage.FromBundle("Cancel").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            BackButton.SetTitleColor(UIColor.White, UIControlState.Normal);
+            BackButton.SetTitleColor(UIColor.Black, UIControlState.Normal);
             ClearButton.SetTitleColor(UIColor.White, UIControlState.Normal);
             BackButton.SetTitleColor(UIColor.Green, UIControlState.Focused);
-            ClearButton.SetTitleColor(UIColor.Green, UIControlState.Focused);
+            ClearButton.SetTitleColor(UIColor.Black, UIControlState.Focused);
+            ClearButton.TintColor = UIColor.White;
             BackButton.TintColor = UIColor.White;
 
             UIBarButtonItem backbarbutton = new UIBarButtonItem(BackButton);
@@ -225,119 +230,11 @@ namespace Squirrel
             get { return mainNavigation; }
             set { mainNavigation = value; }
         }
-    }
 
-    #region
-    public class SideTableViewSource : UITableViewSource
-    {
-        public string CellIdentifier = "OrderItemCell";
-        Dictionary<string, string> OrderedItem;
-        ViewController MainController;
-
-        public SideTableViewSource(Dictionary<string, string> items, ViewController mainController)
+        public void UpdateView()
         {
-            this.MainController = mainController;
-
-            if (items != null)
-            {
-                OrderedItem = items;
-            }
-            else
-            {
-                OrderedItem = new Dictionary<string, string>();
-            }
-        }
-
-        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-        {
-            var cell = tableView.DequeueReusableCell(CellIdentifier, indexPath) as SideTableViewCell;
-            string item = OrderedItem[indexPath.Row.ToString()];
-
-            //if there are no cells to reuse, create a new one
-            if (cell == null)
-            { cell = (SideTableViewCell)new UITableViewCell(UITableViewCellStyle.Default, CellIdentifier); }
-            //cell.TextLabel.Text = item;
-            //cell.SetItemName = item;
-            //cell.SetPriceName = "$" + item;
-
-            return cell;
-        }
-
-        public override nint RowsInSection(UITableView tableview, nint section)
-        {
-            //return OrderedItem.Count;
-            return 0;
-        }
-
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            //MainController.DeleteRow(indexPath.Row);
-        }
-
-        public Dictionary<string, string> ItemDictonary
-        {
-            get { return OrderedItem; }
-            set { OrderedItem = value; }
+            CollectionView.ReloadData();
         }
 
     }
-
-    public sealed class PaddedLabel : UILabel
-    {
-        private UIEdgeInsets EdgeInsets { get; set; }
-
-        public PaddedLabel()
-        {
-            EdgeInsets = new UIEdgeInsets(10, 15, 0, 0);
-        }
-
-        public override void DrawText(CoreGraphics.CGRect rect)
-        {
-            base.DrawText(EdgeInsets.InsetRect(rect));
-        }
-    }
-
-    public class SideTableViewCell : UITableViewCell
-    {
-        UILabel headingLabel, subheadingLabel;
-        UIImageView imageView;
-
-        public SideTableViewCell(NSString cellId) : base(UITableViewCellStyle.Default, cellId)
-        {
-            SelectionStyle = UITableViewCellSelectionStyle.Gray;
-            ContentView.BackgroundColor = UIColor.FromRGB(218, 255, 127);
-            imageView = new UIImageView();
-            headingLabel = new UILabel()
-            {
-                Font = UIFont.FromName("Cochin-BoldItalic", 22f),
-                TextColor = UIColor.FromRGB(127, 51, 0),
-                BackgroundColor = UIColor.Clear
-            };
-            subheadingLabel = new UILabel()
-            {
-                Font = UIFont.FromName("AmericanTypewriter", 12f),
-                TextColor = UIColor.FromRGB(38, 127, 0),
-                TextAlignment = UITextAlignment.Center,
-                BackgroundColor = UIColor.Clear
-            };
-            ContentView.AddSubviews(new UIView[] { headingLabel, subheadingLabel, imageView });
-
-        }
-        public void UpdateCell(string caption, string subtitle, UIImage image)
-        {
-            imageView.Image = image;
-            headingLabel.Text = caption;
-            subheadingLabel.Text = subtitle;
-        }
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-            imageView.Frame = new CGRect(ContentView.Bounds.Width - 63, 5, 33, 33);
-            headingLabel.Frame = new CGRect(5, 4, ContentView.Bounds.Width - 63, 25);
-            subheadingLabel.Frame = new CGRect(100, 18, 100, 20);
-        }
-    }
-
-
-    #endregion
 }
